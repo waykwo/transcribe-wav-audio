@@ -11,6 +11,7 @@ import torch
 from pathlib import Path
 from typing import List, Dict, Tuple
 import sys
+import argparse
 
 
 def load_audio(audio_path: str, duration_seconds: int = None) -> str:
@@ -26,7 +27,7 @@ def load_audio(audio_path: str, duration_seconds: int = None) -> str:
     """
     print(f"Loading audio file: {audio_path}")
     audio = AudioSegment.from_file(audio_path)
-    
+
     # Trim audio if duration is specified (for testing)
     if duration_seconds is not None:
         duration_ms = duration_seconds * 1000
@@ -76,7 +77,7 @@ def diarize_audio(audio_path: str, hf_token: str, num_speakers: int = 2) -> List
     print("\nLoading speaker diarization model...")
     pipeline = Pipeline.from_pretrained(
         "pyannote/speaker-diarization-3.1",
-        token=hf_token
+        use_auth_token=hf_token
     )
 
     # Use MPS (Metal Performance Shaders) for M-series Macs if available
@@ -192,8 +193,22 @@ def save_transcript(segments: List[Dict[str, any]], output_path: str) -> None:
 def main():
     """Main execution function."""
 
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Transcribe audio with speaker diarization')
+    parser.add_argument('--test', type=int, metavar='SECONDS',
+                        help='Test mode: process only first N seconds of audio')
+    parser.add_argument('--audio', type=str, default='./audio/audio.m4a',
+                        help='Path to audio file (default: ./audio/audio.m4a)')
+    parser.add_argument('--speakers', type=int, default=2,
+                        help='Number of speakers (default: 2)')
+    parser.add_argument('--model', type=str, default='small',
+                        choices=['tiny', 'base', 'small', 'medium', 'large'],
+                        help='Whisper model size (default: small)')
+    args = parser.parse_args()
+
     # Configuration
-    AUDIO_FILE = "./audio/audio.m4a"  # UPDATE THIS PATH
+    AUDIO_FILE = args.audio
     # Path to file containing your HuggingFace token
     HF_TOKEN_FILE = "/Volumes/Encrypted/hugging-face-token.txt"
 
@@ -201,11 +216,9 @@ def main():
     with open(HF_TOKEN_FILE, 'r') as f:
         HF_TOKEN = f.read().strip()
 
-    NUM_SPEAKERS = 2
-    WHISPER_MODEL = "small"  # Options: tiny, base, small, medium, large
-    
-    # TEST MODE: Set to number of seconds to process (e.g., 60 for 1 minute), or None for full audio
-    TEST_DURATION = 60  # Set to None to process the entire file
+    NUM_SPEAKERS = args.speakers
+    WHISPER_MODEL = args.model
+    TEST_DURATION = args.test  # None if not specified, otherwise number of seconds
 
     # Check if paths need updating
     if "path/to/your" in AUDIO_FILE:
@@ -216,8 +229,12 @@ def main():
         print("ERROR: Please update HF_TOKEN in the script")
         sys.exit(1)
 
+    # Create output directory if it doesn't exist
+    output_dir = Path("./output")
+    output_dir.mkdir(exist_ok=True)
+
     # Generate output filename
-    output_file = Path(AUDIO_FILE).stem + "_transcript.txt"
+    output_file = output_dir / (Path(AUDIO_FILE).stem + "_transcript.txt")
 
     print("Starting transcription process...")
     print(f"Audio file: {AUDIO_FILE}")
