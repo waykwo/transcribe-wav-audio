@@ -2,8 +2,13 @@
 
 A Python script that transcribes audio files and identifies different speakers using OpenAI's Whisper and pyannote.audio for speaker diarization.
 
+## 🔒 Privacy First
+
+**All processing happens locally on your machine.** Your audio files never leave your computer - no data is sent to OpenAI, cloud services, or any external servers. Perfect for sensitive conversations, confidential meetings, or any content requiring complete privacy.
+
 ## Features
 
+- 🔐 **100% Local Processing**: All transcription and speaker identification runs on your local machine
 - 🎙️ **Accurate Transcription**: Uses OpenAI's Whisper model for high-quality speech-to-text
 - 👥 **Speaker Identification**: Automatically identifies and labels different speakers
 - ⏱️ **Timestamps**: Includes precise timestamps for each segment
