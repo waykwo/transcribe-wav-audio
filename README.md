@@ -11,6 +11,7 @@ A Python script that transcribes audio files and identifies different speakers u
 - 🔐 **100% Local Processing**: All transcription and speaker identification runs on your local machine
 - 🎙️ **Accurate Transcription**: Uses OpenAI's Whisper model for high-quality speech-to-text
 - 👥 **Speaker Identification**: Automatically identifies and labels different speakers
+- 🎵 **Multiple Audio Formats**: Supports MP3, M4A, WAV, FLAC, OGG, and more
 - ⏱️ **Timestamps**: Includes precise timestamps for each segment
 - 🧪 **Test Mode**: Process only the first N seconds for quick testing
 - 🍎 **Mac Optimization**: Supports Metal (MPS) acceleration on Apple Silicon
