@@ -4,18 +4,27 @@ A Python script that transcribes audio files and identifies different speakers u
 
 ## 🔒 Privacy First
 
-**All processing happens locally on your machine.** Your audio files never leave your computer - no data is sent to OpenAI, cloud services, or any external servers. Perfect for sensitive conversations, confidential meetings, or any content requiring complete privacy.
+**Complete privacy guaranteed - 100% local processing.**
+
+- ✅ Your audio files **never leave your computer**
+- ✅ Transcription runs entirely on your machine (no OpenAI API calls)
+- ✅ Summarization uses local Ollama (no cloud LLM services)
+- ✅ No data sent to any external servers or third parties
+- ✅ Perfect for confidential meetings, sensitive conversations, or private content
+
+**Even though this project uses "OpenAI's Whisper", it runs the open-source model locally on your machine - not through OpenAI's servers.**
 
 ## Features
 
-- 🔐 **100% Local Processing**: All transcription and speaker identification runs on your local machine
+- 🔐 **100% Local & Private**: All transcription, speaker ID, and AI summarization run locally - zero cloud usage
 - 🎙️ **Accurate Transcription**: Uses OpenAI's Whisper model for high-quality speech-to-text
 - 👥 **Speaker Identification**: Automatically identifies and labels different speakers
+- 🤖 **AI-Powered Summaries**: Generate brief, medium, or detailed summaries using local Llama 3.1
 - 🎵 **Multiple Audio Formats**: Supports MP3, M4A, WAV, FLAC, OGG, and more
 - ⏱️ **Timestamps**: Includes precise timestamps for each segment
 - 🧪 **Test Mode**: Process only the first N seconds for quick testing
 - 🍎 **Mac Optimization**: Supports Metal (MPS) acceleration on Apple Silicon
-- 📝 **Formatted Output**: Clean, readable transcript format
+- 📝 **Formatted Output**: Clean, readable transcript and summary formats
 
 ## Requirements
 
@@ -42,7 +51,7 @@ A Python script that transcribes audio files and identifies different speakers u
 3. **Install dependencies**
 
    ```bash
-   pip install openai-whisper pyannote.audio torch torchaudio pydub
+   pip install openai-whisper pyannote.audio torch torchaudio pydub ollama
    pip install 'huggingface_hub<1.0.0'  # Required for compatibility
    ```
 
@@ -126,6 +135,16 @@ python transcribe-meeting.py --help
 
 The script generates a formatted transcript in the `./output` directory with speaker labels and timestamps.
 
+**Example format:**
+
+```
+[00:00] SPEAKER_1: [Transcribed content here]
+[00:15] SPEAKER_2: [Transcribed content here]
+[00:32] SPEAKER_1: [Transcribed content here]
+```
+
+All transcripts are saved locally and never uploaded anywhere.
+
 ## Model Sizes
 
 Choose a Whisper model based on your needs:
@@ -138,36 +157,142 @@ Choose a Whisper model based on your needs:
 | `medium` | 769 MB  | Slow     | Great   |
 | `large`  | 1550 MB | Slowest  | Best    |
 
+## Transcript Summarization
+
+After transcribing your audio, you can generate AI-powered summaries using local LLMs via Ollama.
+
+### 🔒 Privacy: Local AI Summarization
+
+**All summarization processing happens on your machine using Ollama:**
+
+- ✅ Your transcripts never leave your computer
+- ✅ No ChatGPT, Claude, or other cloud AI services used
+- ✅ Llama 3.1 model runs entirely locally
+- ✅ Perfect for confidential meeting summaries and sensitive content
+
+### Prerequisites
+
+1. **Install Ollama** (if not already installed)
+
+   - Download from [ollama.com](https://ollama.com/download)
+   - Or install via Homebrew: `brew install ollama`
+
+2. **Pull Llama 3.1 model**
+
+   ```bash
+   ollama pull llama3.1
+   ```
+
+3. **Start Ollama** (if not running)
+   ```bash
+   ollama serve
+   ```
+
+### Usage
+
+Generate summaries at different detail levels:
+
+```bash
+# Brief summary (3-5 bullet points)
+python summarize_transcript.py output/audio_transcript.txt --detail brief
+
+# Medium summary (main topics, decisions, action items)
+python summarize_transcript.py output/audio_transcript.txt --detail medium
+
+# Detailed summary (comprehensive with full context)
+python summarize_transcript.py output/audio_transcript.txt --detail detailed
+```
+
+### Summary Options
+
+| Detail Level | Description                                                | Best For                    |
+| ------------ | ---------------------------------------------------------- | --------------------------- |
+| `brief`      | 3-5 bullet points with critical information only           | Quick overviews, executives |
+| `medium`     | Main topics, decisions, action items, next steps           | Team updates, status        |
+| `detailed`   | Comprehensive with context, rationale, concerns, deadlines | Complete documentation      |
+
+### Output
+
+Summaries are saved to `./output` with the format: `[original_name]_summary_[detail_level].txt`
+
+Example filename: `meeting_transcript_summary_medium.txt`
+
+**Example summary structure:**
+
+```
+MEETING SUMMARY (MEDIUM)
+================================================================================
+
+Main Topics:
+- [Topic 1]
+- [Topic 2]
+
+Key Decisions:
+- [Decision 1]
+- [Decision 2]
+
+Action Items:
+- [Action with owner]
+
+Next Steps:
+- [Follow-up items]
+```
+
+🔒 **All summaries are generated and stored locally** - no data transmitted to external AI services.
+
 ## Project Structure
 
 ```
 transcribe-wav-audio/
-├── transcribe-meeting.py    # Main script
+├── transcribe-meeting.py    # Main transcription script
+├── summarize_transcript.py  # Summary generation script
 ├── .gitignore               # Git ignore rules
 ├── README.md                # This file
 ├── audio/                   # Audio files (gitignored)
 │   └── audio.m4a
-└── output/                  # Transcripts (gitignored)
-    └── audio_transcript.txt
+└── output/                  # Transcripts & summaries (gitignored)
+    ├── audio_transcript.txt
+    └── audio_transcript_summary_medium.txt
 ```
 
 ## Troubleshooting
 
-### "Could not download pipeline" Error
+### Transcription Issues
+
+**"Could not download pipeline" Error**
 
 - Ensure you've accepted the model terms on HuggingFace
 - Verify your access token is correct and has the necessary permissions
 
-### ImportError or Version Conflicts
+**ImportError or Version Conflicts**
 
 - Make sure `huggingface_hub` version is < 1.0.0
 - Reinstall with: `pip install 'huggingface_hub<1.0.0'`
 
-### Slow Performance
+**Slow Performance**
 
 - Use a smaller Whisper model (`tiny` or `base`)
 - Use test mode to process shorter segments
 - On Apple Silicon Macs, ensure MPS acceleration is enabled
+
+### Summarization Issues
+
+**"Failed to connect to Ollama" Error**
+
+- Verify Ollama is installed: `which ollama`
+- Check if Ollama is running: `ollama list`
+- Start Ollama service: `ollama serve`
+
+**Model Not Found**
+
+- Pull the Llama 3.1 model: `ollama pull llama3.1`
+- Verify available models: `ollama list`
+
+**Summary Quality Issues**
+
+- Try a different detail level (`brief`, `medium`, `detailed`)
+- For very long transcripts, consider breaking into smaller segments
+- Different Ollama models may produce varying results: `--model llama3.1`
 
 ## License
 
