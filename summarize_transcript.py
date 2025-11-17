@@ -44,6 +44,17 @@ DETAIL_PROMPTS: Dict[str, str] = {
         "- Action items with owners and deadlines\n"
         "- Any follow-up needed"
     ),
+    "comprehensive": (
+        "Create a detailed meeting report that preserves all discussion points, including:\n"
+        "- Every topic discussed with full context\n"
+        "- All viewpoints and perspectives shared by each speaker\n"
+        "- Complete list of decisions with reasoning\n"
+        "- All action items with context\n"
+        "- Questions raised and answers given\n"
+        "- Any concerns, objections, or alternative suggestions mentioned\n"
+        "\n"
+        "Do not condense or omit details. This should be a thorough documentation of the meeting."
+    ),
 }
 
 
@@ -110,6 +121,15 @@ def generate_summary(
         # Create the full prompt with transcript
         full_prompt = f"{prompt}\n\nTranscript:\n{transcript}"
 
+        # Configure options based on detail level
+        options = {}
+        if detail_level == "comprehensive":
+            options = {
+                "num_predict": 8000,  # Allow much longer output
+                "temperature": 0.3,    # More factual
+            }
+            print("Using comprehensive mode: extended output length, factual temperature")
+
         # Call Ollama API
         response = ollama.chat(
             model=model,
@@ -118,7 +138,8 @@ def generate_summary(
                     'role': 'user',
                     'content': full_prompt,
                 }
-            ]
+            ],
+            options=options if options else None
         )
 
         summary = response['message']['content']
@@ -191,11 +212,13 @@ Examples:
   python summarize_transcript.py output/audio_transcript.txt --detail brief
   python summarize_transcript.py meeting.txt --detail medium
   python summarize_transcript.py transcript.txt --detail detailed --model llama3.1
+  python summarize_transcript.py meeting.txt --detail comprehensive
 
 Detail Levels:
-  brief    - 3-5 bullet points with critical information only
-  medium   - Main topics, decisions, action items, next steps
-  detailed - Comprehensive summary with all context and details
+  brief         - 3-5 bullet points with critical information only
+  medium        - Main topics, decisions, action items, next steps
+  detailed      - Comprehensive summary with all context and details
+  comprehensive - Exhaustive report preserving all discussion points and viewpoints
         """
     )
 
@@ -208,7 +231,7 @@ Detail Levels:
     parser.add_argument(
         '--detail',
         type=str,
-        choices=['brief', 'medium', 'detailed'],
+        choices=['brief', 'medium', 'detailed', 'comprehensive'],
         default='medium',
         help='Level of detail for the summary (default: medium)'
     )

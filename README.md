@@ -201,15 +201,19 @@ python summarize_transcript.py output/audio_transcript.txt --detail medium
 
 # Detailed summary (comprehensive with full context)
 python summarize_transcript.py output/audio_transcript.txt --detail detailed
+
+# Comprehensive summary (exhaustive report with all discussion points)
+python summarize_transcript.py output/audio_transcript.txt --detail comprehensive
 ```
 
 ### Summary Options
 
-| Detail Level | Description                                                | Best For                    |
-| ------------ | ---------------------------------------------------------- | --------------------------- |
-| `brief`      | 3-5 bullet points with critical information only           | Quick overviews, executives |
-| `medium`     | Main topics, decisions, action items, next steps           | Team updates, status        |
-| `detailed`   | Comprehensive with context, rationale, concerns, deadlines | Complete documentation      |
+| Detail Level    | Description                                                        | Best For                         |
+| --------------- | ------------------------------------------------------------------ | -------------------------------- |
+| `brief`         | 3-5 bullet points with critical information only                   | Quick overviews, executives      |
+| `medium`        | Main topics, decisions, action items, next steps                   | Team updates, status reports     |
+| `detailed`      | Comprehensive with context, rationale, concerns, deadlines         | Complete documentation           |
+| `comprehensive` | Exhaustive report preserving all viewpoints and discussion details | Legal records, thorough archives |
 
 ### Output
 
